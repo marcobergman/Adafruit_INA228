@@ -141,6 +141,7 @@ public:
   bool begin(uint8_t i2c_addr = INA228_I2CADDR_DEFAULT,
              TwoWire *theWire = &Wire);
   void reset(void);
+  void resetAcc(void);
 
   void setShunt(float shunt_res = 0.1, float max_current = 3.2);
   float readDieTemp(void);
@@ -150,6 +151,7 @@ public:
   float readShuntVoltage(void);
   float readPower(void);
   float readEnergy(void);
+  float readCharge(void);
 
   void setMode(INA228_MeasurementMode mode);
   INA228_MeasurementMode getMode(void);

@@ -68,7 +68,8 @@ bool Adafruit_INA228::begin(uint8_t i2c_address, TwoWire *theWire) {
     return false;
   }
 
-  Config = new Adafruit_I2CRegister(i2c_dev, INA228_REG_CONFIG, 2, MSBFIRST);
+  Config = 
+      new Adafruit_I2CRegister(i2c_dev, INA228_REG_CONFIG, 2, MSBFIRST);
   ADC_Config =
       new Adafruit_I2CRegister(i2c_dev, INA228_REG_ADCCFG, 2, MSBFIRST);
   Diag_Alert =
@@ -85,13 +86,22 @@ bool Adafruit_INA228::begin(uint8_t i2c_address, TwoWire *theWire) {
 */
 /**************************************************************************/
 void Adafruit_INA228::reset(void) {
-  Adafruit_I2CRegisterBits reset = Adafruit_I2CRegisterBits(Config, 1, 15);
-  reset.write(1);
+  Adafruit_I2CRegisterBits reset = 
+	  Adafruit_I2CRegisterBits(Config, 1, 15);
+  //reset.write(1);
+  
   Adafruit_I2CRegisterBits alert_conv =
       Adafruit_I2CRegisterBits(Diag_Alert, 1, 14);
   alert_conv.write(1);
   setMode(INA228_MODE_CONTINUOUS);
 }
+
+void Adafruit_INA228::resetAcc(void) {
+  Adafruit_I2CRegisterBits reset = Adafruit_I2CRegisterBits(Config, 1, 14);
+  reset.write(1);
+}
+
+
 
 /**************************************************************************/
 /*!
@@ -207,6 +217,25 @@ float Adafruit_INA228::readEnergy(void) {
     e += buff[i];
   }
   return (float)e * 16 * 3.2 * _current_lsb;
+}
+
+/**************************************************************************/
+/*!
+    @brief Reads and scales the current value of the Charge register.
+    @return The current Charge calculation in Coulombs
+*/
+/**************************************************************************/
+float Adafruit_INA228::readCharge(void) {
+  Adafruit_I2CRegister charge =
+      Adafruit_I2CRegister(i2c_dev, INA228_REG_CHARGE, 5, MSBFIRST);
+  uint8_t buff[5];
+  charge.read(buff, 5);
+  float e = 0;
+  for (int i = 0; i < 5; i++) {
+    e *= 256;
+    e += buff[i];
+  }
+  return (float)e * _current_lsb / 3600;
 }
 
 /**************************************************************************/

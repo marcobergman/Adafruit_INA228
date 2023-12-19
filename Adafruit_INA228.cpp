@@ -75,7 +75,7 @@ bool Adafruit_INA228::begin(uint8_t i2c_address, TwoWire *theWire) {
   Diag_Alert =
       new Adafruit_I2CRegister(i2c_dev, INA228_REG_DIAGALRT, 2, MSBFIRST);
 
-  reset();
+  //reset();
   delay(2); // delay 2ms to give time for first measurement to finish
   return true;
 }
@@ -88,7 +88,7 @@ bool Adafruit_INA228::begin(uint8_t i2c_address, TwoWire *theWire) {
 void Adafruit_INA228::reset(void) {
   Adafruit_I2CRegisterBits reset = 
 	  Adafruit_I2CRegisterBits(Config, 1, 15);
-  //reset.write(1);
+  reset.write(1);
   
   Adafruit_I2CRegisterBits alert_conv =
       Adafruit_I2CRegisterBits(Diag_Alert, 1, 14);
@@ -230,12 +230,15 @@ float Adafruit_INA228::readCharge(void) {
       Adafruit_I2CRegister(i2c_dev, INA228_REG_CHARGE, 5, MSBFIRST);
   uint8_t buff[5];
   charge.read(buff, 5);
-  float e = 0;
+  int64_t c = 0;
   for (int i = 0; i < 5; i++) {
-    e *= 256;
-    e += buff[i];
+    c *= 256;
+    c += buff[i];
   }
-  return (float)e * _current_lsb / 3600;
+  if (c & 0x8000000000)
+    c |= 0xFFFFFF0000000000;
+  Serial.println("c = " + String (c));
+  return float(c) * _current_lsb / 3600;
 }
 
 /**************************************************************************/

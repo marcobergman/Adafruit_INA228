@@ -222,7 +222,7 @@ float Adafruit_INA228::readEnergy(void) {
 /**************************************************************************/
 /*!
     @brief Reads and scales the current value of the Charge register.
-    @return The current Charge calculation in Coulombs
+    @return The current Charge calculation in Coulombs/3600 = Ampere-hours
 */
 /**************************************************************************/
 float Adafruit_INA228::readCharge(void) {

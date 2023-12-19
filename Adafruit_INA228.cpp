@@ -237,7 +237,6 @@ float Adafruit_INA228::readCharge(void) {
   }
   if (c & 0x8000000000)
     c |= 0xFFFFFF0000000000;
-  Serial.println("c = " + String (c));
   return float(c) * _current_lsb / 3600;
 }
 
